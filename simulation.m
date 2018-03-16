@@ -1,29 +1,37 @@
-function [hm,complex,hybrid] = simulation(b,Vm,Km,concentration,NumSim,NumAdj,NE)
+function [hm,complex,hybrid] = simulation(b,v_m,k_m,concentration,num_sim,num_adj,n_e)
     
-ChangeCompartmentRate = 1 / 300;
+change_compartment_rate = 1 / 300;
 div = 0.95;
 complex = 0;
 hm = 0;
 
+% set up initial concentrations (values prportional to conentration - VPTC) of glycans, available to each of enzymes
+
 for i = 1:4    
-    for j = 1:NE
+    for j = 1:n_e
         s(j,i) = 100;
     end;    
-    ss(i) = 100 * (NE - 1);
+    ss(i) = 100 * (n_e - 1);
 end;
 
-for i = 1:NumAdj
-    [s,ss] = adjustment(b,s,ss,Vm,Km,ChangeCompartmentRate,concentration,div,NE);
+% adjust VPTC
+
+for i = 1:num_adj
+    [s,ss] = adjustment(b,s,ss,v_m,k_m,change_compartment_rate,concentration,div,n_e);
 end;
+
+% normalize VPTC
 
 for i = 1:4
-    for j = 1:NE
+    for j = 1:n_e
         s(j,i) = s(j,i) / ss(i);
     end;    
 end;
 
-for i = 1:NumSim
-    a = golgi_sim_full(b,s,Vm,Km,ChangeCompartmentRate,concentration,NE);
+% run the model and record results on a features of the interest
+
+for i = 1:num_sim
+    a = golgi_sim_full(b,s,v_m,k_m,change_compartment_rate,concentration,n_e);
     if a(2) + a(3) + a(4)>1 && a(7) == 0
         hm = hm + 1;
     end;
@@ -32,7 +40,9 @@ for i = 1:NumSim
     end;
 end;
 
-hm = hm / NumSim;
-complex = complex / NumSim;
+% normalize results
+
+hm = hm / num_sim;
+complex = complex / num_sim;
 hybrid = 1 - hm - complex;
 end
