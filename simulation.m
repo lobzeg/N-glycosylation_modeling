@@ -5,8 +5,7 @@ div = 0.95;
 complex = 0;
 hm = 0;
 
-% set up initial concentrations (values prportional to conentration - VPTC) of glycans, available to each of enzymes
-
+% Set up initial concentrations (values prportional to conentration - VPTC) of glycans, available to each of enzymes
 for i = 1:4    
     for j = 1:n_e
         s(j,i) = 100;
@@ -14,22 +13,19 @@ for i = 1:4
     ss(i) = 100 * (n_e - 1);
 end;
 
-% adjust VPTC
-
+% Adjust VPTC
 for i = 1:num_adj
     [s,ss] = adjustment(b,s,ss,v_m,k_m,change_compartment_rate,concentration,div,n_e);
 end;
 
-% normalize VPTC
-
+% Normalize VPTC
 for i = 1:4
     for j = 1:n_e
         s(j,i) = s(j,i) / ss(i);
     end;    
 end;
 
-% run the model and record results on a features of the interest
-
+% Run the model and record results on a features of the interest
 for i = 1:num_sim
     a = golgi_sim_full(b,s,v_m,k_m,change_compartment_rate,concentration,n_e);
     if a(2) + a(3) + a(4)>1 && a(7) == 0
@@ -40,8 +36,7 @@ for i = 1:num_sim
     end;
 end;
 
-% normalize results
-
+% Normalize results
 hm = hm / num_sim;
 complex = complex / num_sim;
 hybrid = 1 - hm - complex;
