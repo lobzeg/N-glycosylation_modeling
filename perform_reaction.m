@@ -1,14 +1,16 @@
-function [a,sia] = perform_reaction(MM,Msum,a,sia,NE)
+function [a,sia] = perform_reaction(m_m,m_sum,a,sia,n_e)
 
-Y = random('unif',0,MM);
-for j = 1:NE
-    if Y < Msum(j)
-        KK = j;
-        Y = MM + 1;
+% Randomly select the next reaction from available ones
+y = random('unif',0,m_m);
+for j = 1:n_e
+    if y < m_sum(j)
+        reaction = j;
+        y = m_m + 1;
     end;
 end;
 
-switch KK
+% Modify the molecule according to selected reaction
+switch reaction
     case 1
         a(2) = a(2) - 1;
     case 2
