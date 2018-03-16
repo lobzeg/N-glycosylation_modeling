@@ -1,4 +1,4 @@
-function [e, MM, Msum] = available_reactions(a,s,Vm,Km,ChangeCompartmentRate,concentration,NE,sia)
+function [e, m_m, m_sum] = available_reactions(a,s,v_m,k_m,change_compartment_rate,concentration,n_e,sia)
 
 % e(1)    ManI
 % e(2)    ManI
@@ -36,73 +36,73 @@ third_arm = a(9);
 fourth_arm = a(10);
 compartment = a(11);
 
-Km7 = Km(7);
-Km8 = Km(8);
-Km9 = Km(9);
-KmGal = Km(10);
-KmSia = Km(15);
-KmE1 = Km(19);
-KmE2 = Km(21);
-T1 = 1 / 36;
+k_m7 = k_m(7);
+k_m8 = k_m(8);
+k_m9 = k_m(9);
+k_m_gal = k_m(10);
+k_m_sia = k_m(15);
+k_m_e1 = k_m(19);
+k_m_e2 = k_m(21);
+t1 = 1 / 36;
 
 % Concentration of enzymes depends on compartment
-% T is a variable taking care of it
+% t is a variable taking care of it
 if compartment == 1
-    for k = 1:(NE - 14)
-        T(k) = 3 * T1 / 5;
+    for k = 1:(n_e - 14)
+        t(k) = 3 * t1 / 5;
     end;
-    for k = (NE - 13) : (NE - 1)
+    for k = (n_e - 13) : (n_e - 1)
         if k ~= 14
-        T(k) = 0;
+        t(k) = 0;
         end;
     end;
 end;
-T(14) = 3 * T1 / 5;
+t(14) = 3 * t1 / 5;
 
 if compartment == 2
-    for k = 1:(NE - 14)
-        T(k) = 9 * T1 / 5;
+    for k = 1:(n_e - 14)
+        t(k) = 9 * t1 / 5;
     end;
-    for k = (NE - 13) : (NE - 1)
+    for k = (n_e - 13) : (n_e - 1)
         if k ~= 14
-        T(k) = T1 / 5;
+        t(k) = t1 / 5;
         end;
     end;
 end;
-T(14) = 9 * T1 / 5;
+t(14) = 9 * t1 / 5;
 
 if compartment == 3
-    for k = 1:(NE - 14)
-        T(k) = 6 * T1 / 5;
+    for k = 1:(n_e - 14)
+        t(k) = 6 * t1 / 5;
     end;
-    for k = (NE - 13) : (NE - 1)
+    for k = (n_e - 13) : (n_e - 1)
         if k ~= 14
-        T(k) = 4 * T1 / 5;
+        t(k) = 4 * t1 / 5;
         end;
     end;
     
 end;
-T(14) = 6 * T1 / 5;
+t(14) = 6 * t1 / 5;
 
 if compartment == 4
-    for k = 1:(NE - 14)
-        T(k) = 2 * T1 / 5;
+    for k = 1:(n_e - 14)
+        t(k) = 2 * t1 / 5;
     end;
-    for k = (NE - 13) : (NE - 1)
+    for k = (n_e - 13) : (n_e - 1)
         if k ~= 14
-        T(k) = 15 * T1 / 5;
+        t(k) = 15 * t1 / 5;
         end;
     end;
     
 end;
-T(14) = 2 * T1 / 5;
+t(14) = 2 * t1 / 5;
 
-for j = 1:NE
+for j = 1:n_e
     e(j) = 0;
 end;
-e(NE) = 1;
+e(n_e) = 1;
 
-% Determine possible reactions based on glycan structure
+% Determine possible reactions based on the glycan structure
 if (manose_first_branch > 0)
     e(1) = 1;
 end;
@@ -128,7 +128,7 @@ end;
 if (first_arm > 0 && bisecting_glcnac == 0 && first_arm < 2 && second_arm < 2 && third_arm < 2 && fourth_arm < 2 )
     e(7) = 1;
     if third_arm > 0
-        Km(7) = Km7 * 0.048;
+        k_m(7) = k_m7 * 0.048;
     end;
 end;
 
@@ -136,7 +136,7 @@ if (first_arm > 0 && bisecting_glcnac == 0 && second_arm == 0)
     e(8) = 1;
     kef = 1;
     if third_arm == 0
-        T(8) = T(8) / 5;
+        t(8) = t(8) / 5;
     end;
     if fourth_arm > 1 && third_arm < 2
         kef = kef * 1.5;
@@ -144,41 +144,41 @@ if (first_arm > 0 && bisecting_glcnac == 0 && second_arm == 0)
     if fourth_arm > 0
         kef = kef * 0.178;
     end;
-    Km(8) = Km8 * kef;
+    k_m(8) = k_m8 * kef;
 end;
 
 if (third_arm == 1 && bisecting_glcnac == 0 && fourth_arm == 0)
     e(9) = 1;
     if second_arm > 0
-        Km(9) = Km9 * 0.692;
+        k_m(9) = k_m9 * 0.692;
     end;
 end;
     
 if (rem(first_arm,3) == 1)
     e(10) = 1;
     if bisecting_glcnac > 0 && third_arm > 0
-        Km(10) = KmGal * 3.62;
+        k_m(10) = k_m_gal * 3.62;
     end;
 end;
 
 if (rem(second_arm,3) == 1)
     e(11) = 1;
     if bisecting_glcnac > 0 && third_arm > 0
-        Km(11) = KmGal * 3.62;
+        k_m(11) = k_m_gal * 3.62;
     end;
 end;
 
 if (rem(third_arm,3) == 1)
     e(12) = 1;
     if bisecting_glcnac > 0 && third_arm > 0
-        Km(12) = KmGal * 3.62;
+        k_m(12) = k_m_gal * 3.62;
     end;
 end;
 
 if (rem(fourth_arm,3) == 1)
     e(13) = 1;
     if bisecting_glcnac > 0 && third_arm > 0
-        Km(13) = KmGal * 3.62;
+        k_m(13) = k_m_gal * 3.62;
     end;
 end;
             
@@ -189,72 +189,72 @@ end;
 if( rem(first_arm,3) == 2 )
     e(15) = 1;
     if sia == 1;
-        Km(15) = KmSia * 5;
+        k_m(15) = k_m_sia * 5;
     end;
 end;
     
 if( rem(second_arm,3) == 2 )
     e(16) = 1;
     if sia == 1;
-        Km(16) = KmSia * 5;
+        k_m(16) = k_m_sia * 5;
     end;
 end;
 
 if( rem(third_arm,3) == 2 )
     e(17) = 1;
     if sia == 1;
-        Km(17) = KmSia * 5;
+        k_m(17) = k_m_sia * 5;
     end;
 end;
     
 if( rem(fourth_arm,3) == 2 )
     e(18) = 1;
     if sia == 1;
-        Km(18) = KmSia * 5;
+        k_m(18) = k_m_sia * 5;
     end;
 end;
     
 if( rem(first_arm,3) == 2 )
     e(19) = 1;
     if second_arm == 0
-        Km(19) = KmE1 * 4;
+        k_m(19) = k_m_e1 * 4;
     end;
 end;
     
 if( rem(second_arm,3) == 2 )
     e(20) = 1;
     if first_arm == 0
-        Km(20) = KmE1 * 4;
+        k_m(20) = k_m_e1 * 4;
     end;
 end;
     
 if( rem(third_arm,3) == 2 )
     e(21) = 1;
     if fourth_arm == 0
-        Km(21) = KmE2 * 4;
+        k_m(21) = k_m_e2 * 4;
     end;
 end;
     
 if( rem(fourth_arm,3) == 2 )
     e(22) = 1;
     if third_arm == 0
-        Km(22) = KmE2 * 4;
+        k_m(22) = k_m_e2 * 4;
     end;
 end;
 
-% Determine likelihood of each reaction    
-MM = 0;
-for j = 1:NE - 1
+% Determine likelihood for each reaction    
+m_m = 0;
+for j = 1:n_e - 1
     if (e(j) == 1)
-        m(j) = Vm(j) * T(j) / (Km(j) + s(j,compartment) * concentration);                                        
+        m(j) = v_m(j) * t(j) / (k_m(j) + s(j,compartment) * concentration);                                        
     else
         m(j) = 0;
     end;
-    MM = MM + m(j);
-    Msum(j) = MM;
+    m_m = m_m + m(j);
+    m_sum(j) = m_m;
 end;
-m(NE) = ChangeCompartmentRate;
-MM = MM + m(NE);
-Msum(NE) = MM;
+m(n_e) = change_compartment_rate;
+m_m = m_m + m(n_e);
+m_sum(n_e) = m_m;
 
 end
